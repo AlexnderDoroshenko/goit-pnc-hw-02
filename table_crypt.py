@@ -1,12 +1,11 @@
+import logging
 from typing import List, Tuple
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
 def generate_matrix(key: str, row_len: int = 5, col_len: int = 5) -> List[List[str]]:
-    """
-    Generate a matrix with the given row and column lengths using the provided key.
-    
-    Note: 'J' is handled as 'I' to fit the 25-letter alphabet used in the matrix.
-    This is a common practice in classical ciphers to ensure a square matrix.
-    """
+    logging.debug(f"generate_matrix started with key: {key}, row_len: {row_len}, col_len: {col_len}")
     key = key.upper().replace('J', 'I')  # Handle 'J' as 'I'
     alphabet = 'ABCDEFGHIKLMNOPQRSTUVWXYZ'  # 'J' is excluded
     matrix = []
@@ -33,16 +32,11 @@ def generate_matrix(key: str, row_len: int = 5, col_len: int = 5) -> List[List[s
 
     # Create the matrix as a list of lists (2D)
     matrix_2d = [matrix[i:i+col_len] for i in range(0, row_len * col_len, col_len)]
-
+    logging.debug(f"generate_matrix result: {matrix_2d}")
     return matrix_2d
 
-
 def tabular_cipher_encrypt(text: str, key: str) -> List[Tuple[int, int, bool, bool]]:
-    """
-    Encrypt text using a tabular cipher with the given key.
-    
-    Note: 'J' is handled as 'I' to fit the 25-letter alphabet used in the matrix.
-    """
+    logging.debug(f"tabular_cipher_encrypt started with text: {text[:50]}..., key: {key}")
     matrix = generate_matrix(key)
     encrypted_text = []
 
@@ -59,15 +53,11 @@ def tabular_cipher_encrypt(text: str, key: str) -> List[Tuple[int, int, bool, bo
         else:
             encrypted_text.append(char)  # Keep non-alphabetic characters as is
 
+    logging.debug(f"tabular_cipher_encrypt result: {encrypted_text[:50]}...")
     return encrypted_text
 
-
 def tabular_cipher_decrypt(encrypted_text: List[Tuple[int, int, bool, bool]], key: str) -> str:
-    """
-    Decrypt text using a tabular cipher with the given key.
-    
-    Note: 'J' is handled as 'I' to fit the 25-letter alphabet used in the matrix.
-    """
+    logging.debug(f"tabular_cipher_decrypt started with encrypted_text: {encrypted_text[:50]}..., key: {key}")
     matrix = generate_matrix(key)
     decrypted_text = []
 
@@ -81,4 +71,6 @@ def tabular_cipher_decrypt(encrypted_text: List[Tuple[int, int, bool, bool]], ke
         else:
             decrypted_text.append(item)  # Keep non-alphabetic characters as is
 
-    return ''.join(decrypted_text)
+    result = ''.join(decrypted_text)
+    logging.debug(f"tabular_cipher_decrypt result: {result[:50]}...")
+    return result

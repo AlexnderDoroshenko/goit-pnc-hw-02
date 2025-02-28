@@ -15,7 +15,7 @@ def transpose_with_key(plaintext, key):
     
     return ciphertext
 
-def transpose_with_key_decrypt(ciphertext, key):
+def transpose_with_key_decrypt(ciphertext, key, padding_clear=True):
     key_length = len(key)
     num_rows = len(ciphertext) // key_length
     remainder = len(ciphertext) % key_length
@@ -32,9 +32,13 @@ def transpose_with_key_decrypt(ciphertext, key):
         idx += column_length
     
     # Rebuild the plaintext row by row
-    decrypted_text = ''.join(''.join(columns[j][i] for j in range(key_length)) for i in range(num_rows))
+    decrypted_text = ''.join(''.join(columns[j][i] for j in range(key_length) if i < len(columns[j])) for i in range(num_rows))
     
-    return decrypted_text.rstrip()  # Remove padding from the original plaintext
+    # Remove padding if the lengths differ
+    if padding_clear:
+        decrypted_text = decrypted_text.strip()
+    
+    return decrypted_text
 
 def double_transposition_encrypt(plaintext, key1, key2):
     # First transposition with key1
@@ -45,32 +49,47 @@ def double_transposition_encrypt(plaintext, key1, key2):
 
 def double_transposition_decrypt(ciphertext, key1, key2):
     # First decryption with key2
-    intermediate_text = transpose_with_key_decrypt(ciphertext, key2)
+    intermediate_text = transpose_with_key_decrypt(ciphertext, key2, False)
     # Second decryption with key1
     final_plaintext = transpose_with_key_decrypt(intermediate_text, key1)
-    return final_plaintext.rstrip()  # Remove any remaining padding after double decryption
+    # Remove any remaining padding if the lengths differ
+    return final_plaintext
 
-# Example usage
-plaintext = "HELLO THIS IS A SECRET MESSAGE TO ENCRYPT"
-key1 = "SECRET"
-key2 = "KEYWORD"
 
-# Encryption
-ciphertext_1key = transpose_with_key(plaintext, key1)
-print(f"Ciphertext for key {key1}:", ciphertext_1key)
+# # Example usage
+# plaintext = "HELLO THIS IS A SECRET MESSAGE TO ENCRYPT"
+# key1 = "SECRET"
+# key2 = "KEYWORD"
 
-ciphertext_2key = transpose_with_key(plaintext, key2)
-print(f"Ciphertext for key {key2}:", ciphertext_2key)
+# # Encryption
+# ciphertext_1key = transpose_with_key(plaintext, key1)
+# print(f"Ciphertext for key {key1}:", ciphertext_1key)
 
-ciphertext_double = double_transposition_encrypt(plaintext, key1, key2)
-print("Ciphertext double keys:", ciphertext_double)
+# ciphertext_2key = transpose_with_key(plaintext, key2)
+# print(f"Ciphertext for key {key2}:", ciphertext_2key)
 
-# Decryption
-decryptedtext_1key = transpose_with_key_decrypt(ciphertext_1key, key1)
-print(f"Decrypted Text for key {key1}:", decryptedtext_1key)
+# ciphertext_double = double_transposition_encrypt(plaintext, key1, key2)
+# print("Ciphertext double keys:", ciphertext_double)
 
-decryptedtext_2key = transpose_with_key_decrypt(ciphertext_2key, key2)
-print(f"Decrypted Text for key {key2}:", decryptedtext_2key)
+# # Decryption
+# decryptedtext_1key = transpose_with_key_decrypt(ciphertext_1key, key1)
+# print(f"Decrypted Text for key {key1}:", decryptedtext_1key)
 
-decrypted_text = double_transposition_decrypt(ciphertext_double, key1, key2)
-print("Decrypted Text double keys:", decrypted_text)
+# decryptedtext_2key = transpose_with_key_decrypt(ciphertext_2key, key2)
+# print(f"Decrypted Text for key {key2}:", decryptedtext_2key)
+
+# decrypted_text_with_double = double_transposition_decrypt(ciphertext_double, key1, key2)
+# print("Decrypted Text double keys:", decrypted_text_with_double)
+
+
+# # steps of double transposition encryption
+# decrypted_text_with_2nd_key = transpose_with_key_decrypt(ciphertext_double, key2)
+# print(f"Decrypted doubled Text with 2 key {key2}:", decrypted_text_with_2nd_key)
+# # 4. Decrypt the intermediate text with the first key
+# decrypted_text_with_1st_key = transpose_with_key_decrypt(decrypted_text_with_2nd_key, key1)
+# print(f"Decrypted doubled Text with 1 key {key1}:", decrypted_text_with_1st_key)
+# # 5. Return the decrypted plaintext in the previous step
+# print("Decrypted Text double keys:", decrypted_text_with_1st_key)
+# # 6. The decrypted text should match the original plaintext
+# print(f"Decrypted Text match original plaintext:", decrypted_text_with_1st_key == plaintext)
+# print(f"Decrypted Text len: {len(decrypted_text_with_1st_key)}, original plaintext len:{len(plaintext)}")

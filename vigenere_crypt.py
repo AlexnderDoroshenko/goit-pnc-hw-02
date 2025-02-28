@@ -5,13 +5,15 @@ from collections import Counter
 def vigenere_encrypt(plaintext: str, key: str) -> str:
     ciphertext = []
     key = key.upper()
-    plaintext = plaintext
     key_length = len(key)
     
-    for i, char in enumerate(plaintext.upper()):
+    for i, char in enumerate(plaintext):
         if char.isalpha():  # Encrypt only alphabetic characters
             shift = ord(key[i % key_length]) - ord('A')
-            encrypted_char = chr((ord(char) - ord('A') + shift) % 26 + ord('A'))
+            if char.isupper():
+                encrypted_char = chr((ord(char) - ord('A') + shift) % 26 + ord('A'))
+            else:
+                encrypted_char = chr((ord(char) - ord('a') + shift) % 26 + ord('a'))
             ciphertext.append(encrypted_char)
         else:
             ciphertext.append(char)  # If it's not a letter (e.g., space), leave it unchanged
@@ -21,13 +23,15 @@ def vigenere_encrypt(plaintext: str, key: str) -> str:
 def vigenere_decrypt(ciphertext: str, key: str) -> str:
     decrypted_text = []
     key = key.upper()
-    ciphertext = ciphertext
     key_length = len(key)
     
-    for i, char in enumerate(ciphertext.upper()):
+    for i, char in enumerate(ciphertext):
         if char.isalpha():  # Decrypt only alphabetic characters
             shift = ord(key[i % key_length]) - ord('A')
-            decrypted_char = chr((ord(char) - ord('A') - shift) % 26 + ord('A'))
+            if char.isupper():
+                decrypted_char = chr((ord(char) - ord('A') - shift) % 26 + ord('A'))
+            else:
+                decrypted_char = chr((ord(char) - ord('a') - shift) % 26 + ord('a'))
             decrypted_text.append(decrypted_char)
         else:
             decrypted_text.append(char)  # If it's not a letter, leave it unchanged
